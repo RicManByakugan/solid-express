@@ -1,0 +1,60 @@
+// schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "foreignKeys"
+}
+
+model User {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  roleId     Int      @db.UnsignedInt
+  role       Role     @relation(fields: [roleId], references: [id])
+  name       String   @db.VarChar(255)
+  first_name String   @db.VarChar(255)
+  cin        String   @db.VarChar(255)
+  phone      String   @db.VarChar(255)
+  password   String   @db.VarChar(255)
+  createdAt  DateTime @default(now())
+
+  Livre   Livre[]
+  Emprunt Emprunt[]
+
+  @@index([roleId])
+}
+
+model Role {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  name      String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  User      User[]
+}
+
+model Livre {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  title       String    @db.VarChar(255)
+  author      String    @db.VarChar(255)
+  description String    @db.Text
+  createdAt   DateTime  @default(now())
+  userId      Int       @db.UnsignedInt
+  User        User      @relation(fields: [userId], references: [id])
+  Emprunt     Emprunt[]
+
+  @@index([userId])
+}
+
+model Emprunt {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @db.UnsignedInt
+  LivreId    Int      @db.UnsignedInt
+  user       User     @relation(fields: [userId], references: [id])
+  livre      Livre    @relation(fields: [LivreId], references: [id])
+  createdAt  DateTime @default(now())
+  date_rendu DateTime
+
+  @@index([userId])
+  @@index([LivreId])
+}
