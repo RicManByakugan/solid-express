@@ -1,0 +1,34 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LivreService {
+  private apiUrl = 'http://localhost:5000/api/livre'; // URL du backend
+
+  constructor(private http: HttpClient) {}
+
+  /**
+   * Envoie un livre avec une image au backend
+   * @param data Données du livre (title, author, description)
+   * @param file Fichier image (cover)
+   * @returns Observable de la réponse du backend
+   */
+  createLivre(data: any, file: File): Observable<any> {
+    const formData = new FormData();
+
+    // Ajouter les données du livre
+    Object.keys(data).forEach(key => {
+      formData.append(key, data[key]);
+    });
+
+    // Ajouter le fichier image
+    if (file) {
+      formData.append('cover', file); // 'cover' doit correspondre à ce que Multer attend
+    }
+
+    return this.http.post(`${this.apiUrl}/create`, formData);
+  }
+}

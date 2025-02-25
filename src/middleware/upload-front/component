@@ -1,0 +1,43 @@
+import { Component } from '@angular/core';
+import { LivreService } from '../services/livre.service';
+
+@Component({
+  selector: 'app-livre',
+  templateUrl: './livre.component.html',
+  styleUrls: ['./livre.component.css']
+})
+export class LivreComponent {
+  livreData = {
+    title: '',
+    author: '',
+    description: ''
+  };
+  selectedFile: File | null = null;
+
+  constructor(private livreService: LivreService) {}
+
+  // Fonction pour récupérer le fichier sélectionné
+  onFileSelected(event: any): void {
+    if (event.target.files.length > 0) {
+      this.selectedFile = event.target.files[0]; // Récupère le fichier
+    }
+  }
+
+  // Soumettre les données
+  onSubmit(): void {
+    if (!this.selectedFile) {
+      alert('Veuillez sélectionner une image !');
+      return;
+    }
+
+    this.livreService.createLivre(this.livreData, this.selectedFile).subscribe(
+      (response) => {
+        console.log('Livre créé avec succès !', response);
+        alert('Livre ajouté !');
+      },
+      (error) => {
+        console.error('Erreur lors de l\'ajout du livre', error);
+      }
+    );
+  }
+}

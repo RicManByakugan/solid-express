@@ -1,0 +1,17 @@
+<h2>Ajouter un Livre</h2>
+
+<form (submit)="onSubmit()">
+  <label for="title">Titre:</label>
+  <input type="text" id="title" [(ngModel)]="livreData.title" name="title" required>
+
+  <label for="author">Auteur:</label>
+  <input type="text" id="author" [(ngModel)]="livreData.author" name="author" required>
+
+  <label for="description">Description:</label>
+  <textarea id="description" [(ngModel)]="livreData.description" name="description" required></textarea>
+
+  <label for="cover">Image de couverture:</label>
+  <input type="file" id="cover" (change)="onFileSelected($event)" accept="image/*" required>
+
+  <button type="submit">Créer le Livre</button>
+</form>

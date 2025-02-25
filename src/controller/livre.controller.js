@@ -6,6 +6,9 @@ const {
   getLivreById,
 } = require("../services/livre.service");
 const { ApiResponseV2 } = require("../utils/api.response");
+const { v4: uuidv4 } = require("uuid");
+const supabase = require("../../configuration/supabase");
+const { slugify } = require("../utils/slugify");
 
 exports.getAllLivres = async (req, res) => {
   try {
@@ -48,6 +51,33 @@ exports.getLivreById = async (req, res) => {
 exports.createLivre = async (req, res) => {
   try {
     req.body.userId = req.user.id;
+
+    let coverUrl = null;
+
+    if (req.file) {
+      const originalName = req.file.originalname;
+      const cleanFileName = slugify(originalName);
+      const fileName = `covers/${uuidv4()}-${cleanFileName}`;
+      const { data, error } = await supabase.storage
+        .from("livres")
+        .upload(fileName, req.file.buffer, {
+          contentType: req.file.mimetype,
+          upsert: true,
+        });
+
+      if (error) {
+        throw new Error("Échec de l'upload de l'image : " + error.message);
+      }
+
+      const { data: publicUrl } = await supabase.storage
+        .from("livres")
+        .getPublicUrl(fileName);
+      coverUrl = publicUrl.publicUrl;
+    }
+
+
+    // const coverFilename = req.file ? req.file.filename : null;
+    req.body.cover = coverUrl;
     const book = await createLivre(req.body);
     return ApiResponseV2(res, 201, "Book created successfully", book);
   } catch (error) {

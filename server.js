@@ -6,6 +6,7 @@ const csrf = require("csurf");
 const cookieParser = require("cookie-parser");
 const compression = require("compression");
 const xss = require("xss-clean");
+const path = require("path");
 const {
   httpLogger,
   logInfo,
@@ -45,6 +46,8 @@ server.use(compression());
 // Parser pour JSON
 server.use(express.json());
 
+server.use(express.urlencoded({ extended: true }));
+
 // Logging en développement
 if (config.server.nodeEnv === "development") {
   server.use((req, res, next) => {
@@ -78,6 +81,9 @@ server.use((req, res, next) => {
   next();
 });
 
+// Route for Media
+server.use("/media", express.static(path.join(__dirname, "media")));
+
 // Routes API
 server.use("/api", app);
 
@@ -98,7 +104,9 @@ server.use((err, req, res, next) => {
   res.status(err.status || 500).json({
     status: "error",
     message:
-      config.server.nodeEnv === "production" ? "Une erreur est survenue" : err.message,
+      config.server.nodeEnv === "production"
+        ? "Une erreur est survenue"
+        : err.message,
     ...(config.server.nodeEnv === "development" && { stack: err.stack }),
   });
 });

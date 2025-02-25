@@ -14,10 +14,22 @@ const {
 
 const { isAuth } = require("../middleware/is.auth");
 
+const { upload } = require("../middleware/upload");
+
+const { upload_memory } = require("../middleware/upload-memory");
+
 router.get("/", isAuth, getAllLivres);
 router.get("/all-paginated", isAuth, getAllLivresWithPagination);
 router.get("/:id", isAuth, getLivreById);
-router.post("/create", isAuth, validateDto(createLivreDto), createLivre);
+router.post(
+  "/create",
+  isAuth,
+  // upload.single("cover"),
+  upload_memory.single("cover"),
+  validateDto(createLivreDto),
+  // upload.array("cover", 5),
+  createLivre
+);
 router.put("/update/:id", isAuth, validateDto(updateLivreDto), updateLivre);
 
 module.exports = router;

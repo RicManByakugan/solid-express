@@ -34,6 +34,7 @@ model Role {
 
 model Livre {
   id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  cover       String?   @db.VarChar(255)
   title       String    @db.VarChar(255)
   author      String    @db.VarChar(255)
   description String    @db.Text
